@@ -123,13 +123,6 @@ def stroke_to_mapnik(stroke):
         else:
             raise Exception('unhanded: ' + css.get('name'))
     return m_stroke
-
-def text_to_mapnik(text):
-    fill = getattr(text,'Fill',None)
-    if fill:
-        for css in fill.CssParameter:
-            if css.get('name') == 'fill':
-                pass
     
 def fix_colors(tree):
     if hasattr(tree,'Style'):
@@ -140,7 +133,6 @@ def fix_colors(tree):
                         if child.tag.endswith('Symbolizer'):
                             items = child.items()
                             for i in items:
-                                #import pdb;pdb.set_trace()
                                 if len(i) == 2:
                                     name,value = i
                                     if str(value).startswith('rgb('):
@@ -214,7 +206,6 @@ def main(root,**options):
                         text = rule.TextSymbolizer
                         name = text.Label.find("{%s}PropertyName" % rule.nsmap['ogc'])
                         face_name = '[%s]' % text.Font
-                        import pdb;pdb.set_trace()#m_text = text_to_mapnik(text)
 
                         face_name = 'DejaVu Sans Book'
                         size = 10
