@@ -4,6 +4,7 @@ import os
 import sys
 import optparse
 import tempfile
+import shlex
 import mapnik2 as mapnik
 from lxml import etree
 from lxml import objectify
@@ -94,17 +95,6 @@ def ogc_filter_to_mapnik(ogc_filter):
     else:
         return mapnik.Filter(str(cql))
 
-def fill_to_mapnik(fill):
-    m_poly = mapnik.PolygonSymbolizer()
-    for css in fill.CssParameter:
-        if css.get('name') == 'fill':
-            m_poly.fill = mapnik.Color(css.text)
-        elif css.get('name') == 'fill-opacity':
-            m_poly.opacity = float(css.text)
-        else:
-            raise Exception('unhanded: ' + css.get('name'))
-    return m_poly
-
 def stroke_to_mapnik(stroke):
     m_stroke = mapnik.Stroke()
     for css in stroke.CssParameter:
@@ -120,6 +110,10 @@ def stroke_to_mapnik(stroke):
             m_stroke.line_cap = get_cap(css.text)
         elif css.get('name') == 'stroke-join':
             m_stroke.line_join = get_join(css.text)
+        elif css.get('name') == 'stroke-linejoin':
+            m_stroke.line_join = get_join(css.text)
+        elif css.get('name') == 'stroke-dashoffset':
+            m_stroke.dash_offset = float(css.text)
         else:
             raise Exception('unhanded: ' + css.get('name'))
     return m_stroke
@@ -194,8 +188,21 @@ def main(root,**options):
                         m_stroke = stroke_to_mapnik(stroke)
                         m_rule.symbols.append(mapnik.LineSymbolizer(m_stroke))
                     if hasattr(rule,'PolygonSymbolizer'):
-                        fill = rule.PolygonSymbolizer.Fill
-                        m_poly = fill_to_mapnik(fill)
+                        m_poly = mapnik.PolygonSymbolizer()
+                        if hasattr(rule.PolygonSymbolizer,'Fill'):
+                            fill = rule.PolygonSymbolizer.Fill
+                            for css in fill.CssParameter:
+                                if css.get('name') == 'fill':
+                                    m_poly.fill = mapnik.Color(css.text)
+                                elif css.get('name') == 'fill-opacity':
+                                    m_poly.opacity = float(css.text)
+                                else:
+                                    raise Exception('unhanded: ' + css.get('name'))
+                        if hasattr(rule.PolygonSymbolizer,'Stroke'):
+                            stroke = rule.PolygonSymbolizer.Stroke
+                            m_stroke = stroke_to_mapnik(stroke)
+                            m_rule.symbols.append(mapnik.LineSymbolizer(m_stroke))
+                            
                         m_rule.symbols.append(m_poly)
                     if hasattr(rule,'PointSymbolizer'):
                         #fill = rule.PolygonSymbolizer.Fill
@@ -205,6 +212,9 @@ def main(root,**options):
                     if hasattr(rule,'TextSymbolizer'):
                         text = rule.TextSymbolizer
                         name = text.Label.find("{%s}PropertyName" % rule.nsmap['ogc'])
+                        if not name and hasattr(text,'Label'):
+                            name = shlex.split(str(text.Label))[0]
+
                         face_name = '[%s]' % text.Font
 
                         face_name = 'DejaVu Sans Book'
@@ -218,7 +228,7 @@ def main(root,**options):
                         for css in text.Fill.CssParameter:
                             if css.get('name') == 'fill':
                                 color = mapnik.Color(css.text)
-                        m_text = mapnik.TextSymbolizer(mapnik.Expression(str(name)),str(face_name),int(size),color)
+                        m_text = mapnik.TextSymbolizer(mapnik.Expression('['+str(name)+']'),str(face_name),int(size),color)
                         if hasattr(text,'LabelPlacement'):
                             if hasattr(text.LabelPlacement,'LinePlacement'):
                                 m_text.label_placement = mapnik.label_placement.LINE_PLACEMENT
@@ -261,12 +271,12 @@ if __name__ == '__main__':
         type='str', dest='datasource',
         help='Provide an path to a shapefile datasource')
                     
-    (options, args) = parser.parse_args(sys.argv)
+    (options, args) = parser.parse_args()
     
     if len(args) < 1:
       sys.exit('provide path to an sld file')
 
-    xml = args[1]
+    xml = args[0]
             
     tree = objectify.parse(xml)
     root = tree.getroot()

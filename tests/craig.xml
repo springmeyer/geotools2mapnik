@@ -1,0 +1,59 @@
+<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd">
+  <NamedLayer>
+    <Name>Default Polygon</Name>
+    <UserStyle>
+      <Title>Default polygon style</Title>
+      <FeatureTypeStyle>
+    <Rule>
+      <MaxScaleDenominator>18056</MaxScaleDenominator>
+      <PolygonSymbolizer>
+        <Stroke>
+          <CssParameter name="stroke">#734C00</CssParameter>
+          <CssParameter name="stroke-linecap">butt</CssParameter>
+          <CssParameter name="stroke-linejoin">miter</CssParameter>
+          <CssParameter name="stroke-opacity">.75</CssParameter>
+          <CssParameter name="stroke-width">0.2</CssParameter>
+          <CssParameter name="stroke-dashoffset">0</CssParameter>
+        </Stroke>
+      </PolygonSymbolizer>
+    </Rule>   
+    <Rule>   
+      <MaxScaleDenominator>3600</MaxScaleDenominator>
+      <TextSymbolizer>
+        <Label>"parcelid"</Label>
+        <Font>
+          <CssParameter name="font-family">DejaVu Sans Book</CssParameter>
+          <CssParameter name="font-size">12</CssParameter>
+          <CssParameter name="font-style">normal</CssParameter>
+          <CssParameter name="font-weight">normal</CssParameter>
+        </Font>
+        <LabelPlacement>
+          <PointPlacement>
+            <AnchorPoint>
+              <AnchorPointX>.5</AnchorPointX>
+              <AnchorPointY>.5</AnchorPointY>
+            </AnchorPoint>
+            <Rotation>0</Rotation>
+          </PointPlacement>
+        </LabelPlacement>
+        <Halo>
+          <Radius>1.5</Radius>
+          <Fill>
+            <CssParameter name="fill">#FBF8F8</CssParameter>
+            <CssParameter name="fill-opacity">1.0</CssParameter>
+          </Fill>
+        </Halo>
+        <Fill>
+          <CssParameter name="fill">#000000</CssParameter>
+          <CssParameter name="fill-opacity">1.0</CssParameter>
+        </Fill>
+        <VendorOption name="spaceAround">3</VendorOption>
+        <VendorOption name="maxDisplacement">100</VendorOption>
+      </TextSymbolizer>
+    </Rule>
+      </FeatureTypeStyle>
+    </UserStyle>
+  </NamedLayer>
+</StyledLayerDescriptor>
